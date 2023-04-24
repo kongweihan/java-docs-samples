@@ -23,7 +23,7 @@ import com.google.cloud.bigtable.admin.v2.models.CreateTableRequest;
 import com.google.cloud.bigtable.beam.CloudBigtableIO;
 import com.google.cloud.bigtable.beam.CloudBigtableTableConfiguration;
 import com.google.cloud.bigtable.grpc.BigtableClusterName;
-import com.google.cloud.bigtable.grpc.BigtableClusterUtilities;
+// import com.google.cloud.bigtable.grpc.BigtableClusterUtilities;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
@@ -72,8 +72,9 @@ public class BulkWrite {
         .build();
 
     BigtableTableAdminClient adminClient = BigtableTableAdminClient.create(adminSettings);
-    int clusterNodeCount = getClusterNodeCount(options.getProject(),
-        options.getBigtableInstanceId());
+    // int clusterNodeCount = getClusterNodeCount(options.getProject(),
+    //     options.getBigtableInstanceId());
+    int clusterNodeCount = 10;
     List<String> newTableIds = getNewTableIds(adminClient, options.getBigtableSize());
 
     // If the specified size of Bigtable is already met, don't run the pipeline.
@@ -147,22 +148,22 @@ public class BulkWrite {
 
   // Get the number of nodes for the Bigtable instance. This only works for single cluster instances
   // so it will treat multi-cluster instances as single node clusters.
-  private static int getClusterNodeCount(String projectId, String instanceId)
-      throws IOException, GeneralSecurityException {
-    try {
-      BigtableClusterUtilities clusterUtility = BigtableClusterUtilities
-          .forInstance(projectId, instanceId);
-      Cluster cluster = clusterUtility.getSingleCluster();
-      String clusterId = new BigtableClusterName(cluster.getName()).getClusterId();
-      String zoneId = BigtableClusterUtilities.getZoneId(cluster);
-      int clusterNodeCount = clusterUtility.getClusterNodeCount(clusterId, zoneId);
-      System.out.println("Cluster size " + clusterNodeCount);
-      return clusterNodeCount;
-    } catch (IllegalStateException e) {
-      System.out.println("Unable to get cluster size. Treating as single-node cluster.");
-      return 1;
-    }
-  }
+  // private static int getClusterNodeCount(String projectId, String instanceId)
+  //     throws IOException, GeneralSecurityException {
+  //   try {
+  //     BigtableClusterUtilities clusterUtility = BigtableClusterUtilities
+  //         .forInstance(projectId, instanceId);
+  //     Cluster cluster = clusterUtility.getSingleCluster();
+  //     String clusterId = new BigtableClusterName(cluster.getName()).getClusterId();
+  //     String zoneId = BigtableClusterUtilities.getZoneId(cluster);
+  //     int clusterNodeCount = clusterUtility.getClusterNodeCount(clusterId, zoneId);
+  //     System.out.println("Cluster size " + clusterNodeCount);
+  //     return clusterNodeCount;
+  //   } catch (IllegalStateException e) {
+  //     System.out.println("Unable to get cluster size. Treating as single-node cluster.");
+  //     return 1;
+  //   }
+  // }
 
   static class CreateMutationFn extends DoFn<Long, Mutation> {
 

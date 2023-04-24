@@ -62,7 +62,6 @@
       <version>2.11.0</version>
     </dependency>
 
-
     <dependency>
       <groupId>com.google.cloud</groupId>
       <artifactId>google-cloud-bigtable</artifactId>
@@ -87,30 +86,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-maven.pkg.dev/cloud-bigtable-ecosystem/bigtable-flow-control-preview</url>
-    </snapshotRepository>
-    <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-maven.pkg.dev/cloud-bigtable-ecosystem/bigtable-flow-control-preview</url>
-    </repository>
-  </distributionManagement>
-
-  <repositories>
-    <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://us-maven.pkg.dev/cloud-bigtable-ecosystem/bigtable-flow-control-preview</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <build>
     <extensions>
