@@ -2,6 +2,7 @@ path:
   pullrequest: true
   labelprefix: "api: "
   paths:
+    accessapproval: "accessapproval"
     aiplatform: "aiplatform"
     appengine-java8: "appengine"
     appengine-java11: "appengine"
@@ -11,7 +12,13 @@ path:
     auth: "auth"
     automl: "automl"
     batch: "batch"
-    bigquery: "bigquery"
+    bigquery:
+      bigquerydatatransfer: "bigquerydatatransfer"
+      bigqueryconnection: "bigqueryconnection"
+      bigqueryreservation: "bigqueryreservation"
+      bigquerystorage: "bigquerystorage"
+      cloud-client: "bigquery"
+      rest: "bigquery"
     bigtable: "bigtable"
     cloud-sql: "cloudsql"
     compute: "compute"

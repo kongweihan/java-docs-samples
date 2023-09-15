@@ -27,11 +27,6 @@ assign_issues_by:
   to:
   - simonz130
 - labels:
-  - 'api: cloudiot'
-  to:
-  - attilagargyan
-  - simoncsaba-g
-- labels:
   - 'api: bigtable'
   - 'api: datastore'
   - 'api: firestore'
@@ -40,11 +35,11 @@ assign_issues_by:
 - labels:
   - 'api: cloudsql'
   to:
-  - GoogleCloudPlatform/infra-db-dpes
+  - GoogleCloudPlatform/infra-db-sdk
 - labels:
   - 'api: spanner'
   to:
-  - rajatbhatta
+  - GoogleCloudPlatform/api-spanner-java
 - labels:
   - 'api: dlp'
   to:
@@ -58,6 +53,51 @@ assign_issues_by:
   - 'api: contentwarehouse'
   to:
   - GoogleCloudPlatform/googleapis-contentwarehouse
+- labels:
+  - 'api: storage'
+  - 'api: storagetransfer'
+  to:
+  - GoogleCloudPlatform/cloud-storage-dpes
+- labels:
+  - "api: cloudiot"
+  to:
+  - GoogleCloudPlatform/api-iot
+- labels:
+  - "api: pubsub"
+  - "api: pubsublite"
+  to:
+  - GoogleCloudPlatform/api-pubsub-and-pubsublite
+- labels:
+  - "api: mediatranslation"
+  - "api: media"
+  to:
+  - GoogleCloudPlatform/cloud-media-team
+- labels:
+  - "api: retail"
+  to:
+  - GoogleCloudPlatform/cloud-retail-team
+- labels:
+  - "api: healthcare"
+  to:
+  - GoogleCloudPlatform/healthcare-life-sciences
+- labels:
+  - "api: recaptchaenterprise"
+  to:
+  - GoogleCloudPlatform/recaptcha-customer-obsession-reviewers
+  - GoogleCloudPlatform/dee-infra
+- labels:
+  - "api: appengine"
+  to:
+  - GoogleCloudPlatform/serverless-runtimes
+- labels:
+  - "api: cloudfunctions"
+  to:
+  - GoogleCloudPlatform/functions-framework-google
+  - GoogleCloudPlatform/torus-dpe
+- labels:
+  - "api: bigquerydatatransfer"
+  to:
+  - GoogleCloudPlatform/bigquery-data-connectors
 
 assign_prs:
   - GoogleCloudPlatform/java-samples-reviewers
@@ -74,11 +114,6 @@ assign_prs_by:
   to:
   - simonz130
 - labels:
-  - 'api: cloudiot'
-  to:
-  - attilagargyan
-  - simoncsaba-g
-- labels:
   - 'api: bigtable'
   - 'api: datastore'
   - 'api: firestore'
@@ -87,7 +122,11 @@ assign_prs_by:
 - labels:
   - 'api: cloudsql'
   to:
-  - GoogleCloudPlatform/infra-db-dpes
+  - GoogleCloudPlatform/infra-db-sdk
+- labels:
+  - 'api: spanner'
+  to:
+  - GoogleCloudPlatform/api-spanner-java
 - labels:
   - 'api: dlp'
   to:
@@ -101,3 +140,48 @@ assign_prs_by:
   - 'api: contentwarehouse'
   to:
   - GoogleCloudPlatform/googleapis-contentwarehouse
+- labels:
+  - 'api: storage'
+  - 'api: storagetransfer'
+  to:
+  - GoogleCloudPlatform/cloud-storage-dpes
+- labels:
+  - "api: cloudiot"
+  to:
+  - GoogleCloudPlatform/api-iot
+- labels:
+  - "api: pubsub"
+  - "api: pubsublite"
+  to:
+  - GoogleCloudPlatform/api-pubsub-and-pubsublite
+- labels:
+  - "api: mediatranslation"
+  - "api: media"
+  to:
+  - GoogleCloudPlatform/cloud-media-team
+- labels:
+  - "api: retail"
+  to:
+  - GoogleCloudPlatform/cloud-retail-team
+- labels:
+  - "api: healthcare"
+  to:
+  - GoogleCloudPlatform/healthcare-life-sciences
+- labels:
+  - "api: recaptchaenterprise"
+  to:
+  - GoogleCloudPlatform/recaptcha-customer-obsession-reviewers
+  - GoogleCloudPlatform/dee-infra
+- labels:
+  - "api: appengine"
+  to:
+  - GoogleCloudPlatform/serverless-runtimes
+- labels:
+  - "api: cloudfunctions"
+  to:
+  - GoogleCloudPlatform/functions-framework-google
+  - GoogleCloudPlatform/torus-dpe
+- labels:
+  - "api: bigquerydatatransfer"
+  to:
+  - GoogleCloudPlatform/bigquery-data-connectors

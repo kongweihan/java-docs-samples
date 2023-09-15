@@ -40,7 +40,7 @@
     <maven.war.plugin>2.6</maven.war.plugin>
 
     <appengine.maven.plugin>2.4.4</appengine.maven.plugin>
-    <jetty.maven.plugin>9.4.51.v20230217</jetty.maven.plugin>
+    <jetty.maven.plugin>11.0.16</jetty.maven.plugin>
 
     <failOnMissingWebXml>false</failOnMissingWebXml> <!-- REQUIRED -->
   </properties>
@@ -52,7 +52,7 @@
         <groupId>com.google.cloud</groupId>
         <scope>import</scope>
         <type>pom</type>
-        <version>26.17.0</version>
+        <version>26.22.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
+      <version>4.0.1</version>
       <type>jar</type>
       <scope>provided</scope>
     </dependency>

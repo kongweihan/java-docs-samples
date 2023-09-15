@@ -130,67 +130,6 @@ public class InspectTests extends TestBase {
     }
   }
 
-  public static void createStoredInfoType(String projectId, String outputPath, String infoTypeId)
-      throws IOException, InterruptedException {
-    try (DlpServiceClient dlp = DlpServiceClient.create()) {
-
-      // Optionally set a display name and a description.
-      String displayName = "GitHub usernames";
-      String description = "Dictionary of GitHub usernames used in commits";
-
-      CloudStoragePath cloudStoragePath = CloudStoragePath.newBuilder().setPath(outputPath).build();
-
-      BigQueryTable table =
-          BigQueryTable.newBuilder()
-              .setProjectId("bigquery-public-data")
-              .setTableId("github_nested")
-              .setDatasetId("samples")
-              .build();
-
-      BigQueryField bigQueryField =
-          BigQueryField.newBuilder()
-              .setTable(table)
-              .setField(FieldId.newBuilder().setName("actor").build())
-              .build();
-
-      LargeCustomDictionaryConfig largeCustomDictionaryConfig =
-          LargeCustomDictionaryConfig.newBuilder()
-              .setOutputPath(cloudStoragePath)
-              .setBigQueryField(bigQueryField)
-              .build();
-
-      StoredInfoTypeConfig storedInfoTypeConfig =
-          StoredInfoTypeConfig.newBuilder()
-              .setDisplayName(displayName)
-              .setDescription(description)
-              .setLargeCustomDictionary(largeCustomDictionaryConfig)
-              .build();
-
-      // Combine configurations into a request for the service.
-      CreateStoredInfoTypeRequest createStoredInfoType =
-          CreateStoredInfoTypeRequest.newBuilder()
-              .setParent(LocationName.of(projectId, "global").toString())
-              .setConfig(storedInfoTypeConfig)
-              .setStoredInfoTypeId(infoTypeId)
-              .build();
-
-      // Send the request and receive response from the service.
-      StoredInfoType response = dlp.createStoredInfoType(createStoredInfoType);
-
-      // Wait for the creation of Stored InfoType.
-      boolean isReady = false;
-      StoredInfoType storedInfoType = null;
-      while (!isReady) {
-        storedInfoType = dlp.getStoredInfoType(response.getName());
-        if (storedInfoType.getCurrentVersion().getState().toString().equals("READY")) {
-          isReady = true;
-        } else {
-          Thread.sleep(5000);
-        }
-      }
-    }
-  }
-
   @Test
   public void testInspectPhoneNumber() throws Exception {
     InspectString.inspectString(PROJECT_ID, "My phone number is (415) 555-0890");
@@ -398,18 +337,43 @@ public class InspectTests extends TestBase {
 
   @Test
   public void testInspectGcsFile() throws Exception {
-    InspectGcsFile.inspectGcsFile(
-        PROJECT_ID, GCS_PATH, topicName.getTopic(), subscriptionName.getSubscription());
+    DlpServiceClient dlpServiceClient = mock(DlpServiceClient.class);
+    doneMock = mock(SettableApiFuture.class);
+    try (MockedStatic<DlpServiceClient> mockedStatic = Mockito.mockStatic(DlpServiceClient.class)) {
+      mockedStatic.when(() -> DlpServiceClient.create()).thenReturn(dlpServiceClient);
+      try (MockedStatic<SettableApiFuture> mockedStatic1 =
+          Mockito.mockStatic(SettableApiFuture.class)) {
+        mockedStatic1.when(() -> SettableApiFuture.create()).thenReturn(doneMock);
 
-    String output = bout.toString();
-    assertThat(output).contains("Job status: DONE");
-    String jobName = Arrays.stream(output.split("\n"))
-        .filter(line -> line.contains("Job name:"))
-        .findFirst()
-        .get();
-    jobName = jobName.split(":")[1].trim();
-    try (DlpServiceClient dlp = DlpServiceClient.create()) {
-      dlp.deleteDlpJob(jobName);
+        InfoTypeStats infoTypeStats =
+            InfoTypeStats.newBuilder()
+                .setInfoType(InfoType.newBuilder().setName("EMAIL_ADDRESS").build())
+                .setCount(1)
+                .build();
+        DlpJob dlpJob =
+            DlpJob.newBuilder()
+                .setName("projects/project_id/locations/global/dlpJobs/job_id")
+                .setState(DlpJob.JobState.DONE)
+                .setInspectDetails(
+                    InspectDataSourceDetails.newBuilder()
+                        .setResult(
+                            InspectDataSourceDetails.Result.newBuilder()
+                                .addInfoTypeStats(infoTypeStats)
+                                .build()))
+                .build();
+        when(doneMock.get(15, TimeUnit.MINUTES)).thenReturn(true);
+        when(dlpServiceClient.createDlpJob(any(CreateDlpJobRequest.class))).thenReturn(dlpJob);
+        when(dlpServiceClient.getDlpJob((GetDlpJobRequest) any())).thenReturn(dlpJob);
+        InspectGcsFile.inspectGcsFile(
+            "project_id", "gs://bucket_name/test.txt", "topic_id", "subscription_id");
+        String output = bout.toString();
+        assertThat(output).contains("Job status: DONE");
+        assertThat(output)
+            .contains("Job name: projects/project_id/locations/global/dlpJobs/job_id");
+        assertThat(output).contains("Info type: EMAIL_ADDRESS");
+        verify(dlpServiceClient, times(1)).createDlpJob(any(CreateDlpJobRequest.class));
+        verify(dlpServiceClient, times(1)).getDlpJob(any(GetDlpJobRequest.class));
+      }
     }
   }
 
@@ -457,39 +421,85 @@ public class InspectTests extends TestBase {
 
   @Test
   public void testInspectDatastoreEntity() throws Exception {
-    InspectDatastoreEntity.insepctDatastoreEntity(
-        PROJECT_ID,
-        datastoreNamespace,
-        datastoreKind,
-        topicName.getTopic(),
-        subscriptionName.getSubscription());
+    DlpServiceClient dlpServiceClient = mock(DlpServiceClient.class);
+    doneMock = mock(SettableApiFuture.class);
+    try (MockedStatic<DlpServiceClient> mockedStatic = Mockito.mockStatic(DlpServiceClient.class)) {
+      mockedStatic.when(() -> DlpServiceClient.create()).thenReturn(dlpServiceClient);
+      try (MockedStatic<SettableApiFuture> mockedStatic1 =
+                   Mockito.mockStatic(SettableApiFuture.class)) {
+        mockedStatic1.when(() -> SettableApiFuture.create()).thenReturn(doneMock);
 
-    String output = bout.toString();
-    assertThat(output).contains("Job status: DONE");
-    String jobName = Arrays.stream(output.split("\n"))
-        .filter(line -> line.contains("Job name:"))
-        .findFirst()
-        .get();
-    jobName = jobName.split(":")[1].trim();
-    try (DlpServiceClient dlp = DlpServiceClient.create()) {
-      dlp.deleteDlpJob(jobName);
+        InfoTypeStats infoTypeStats =
+                InfoTypeStats.newBuilder()
+                        .setInfoType(InfoType.newBuilder().setName("EMAIL_ADDRESS").build())
+                        .setCount(1)
+                        .build();
+        DlpJob dlpJob =
+                DlpJob.newBuilder()
+                        .setName("projects/project_id/locations/global/dlpJobs/job_id")
+                        .setState(DlpJob.JobState.DONE)
+                        .setInspectDetails(
+                                InspectDataSourceDetails.newBuilder()
+                                        .setResult(
+                                                InspectDataSourceDetails.Result.newBuilder()
+                                                        .addInfoTypeStats(infoTypeStats)
+                                                        .build()))
+                        .build();
+        when(doneMock.get(15, TimeUnit.MINUTES)).thenReturn(true);
+        when(dlpServiceClient.createDlpJob(any(CreateDlpJobRequest.class))).thenReturn(dlpJob);
+        when(dlpServiceClient.getDlpJob((GetDlpJobRequest) any())).thenReturn(dlpJob);
+        InspectDatastoreEntity.insepctDatastoreEntity("project_id", "datastore_namespace_test",
+                "datastore_kind_test", "topic_id", "subscription_id");
+        String output = bout.toString();
+        assertThat(output).contains("Job status: DONE");
+        assertThat(output)
+                .contains("Job name: projects/project_id/locations/global/dlpJobs/job_id");
+        assertThat(output).contains("Info type: EMAIL_ADDRESS");
+        verify(dlpServiceClient, times(1)).createDlpJob(any(CreateDlpJobRequest.class));
+        verify(dlpServiceClient, times(1)).getDlpJob(any(GetDlpJobRequest.class));
+      }
     }
   }
 
   @Test
   public void testInspectBigQueryTable() throws Exception {
-    InspectBigQueryTable.inspectBigQueryTable(
-        PROJECT_ID, DATASET_ID, TABLE_ID, topicName.getTopic(), subscriptionName.getSubscription());
+    DlpServiceClient dlpServiceClient = mock(DlpServiceClient.class);
+    doneMock = mock(SettableApiFuture.class);
+    try (MockedStatic<DlpServiceClient> mockedStatic = Mockito.mockStatic(DlpServiceClient.class)) {
+      mockedStatic.when(() -> DlpServiceClient.create()).thenReturn(dlpServiceClient);
+      try (MockedStatic<SettableApiFuture> mockedStatic1 =
+                   Mockito.mockStatic(SettableApiFuture.class)) {
+        mockedStatic1.when(() -> SettableApiFuture.create()).thenReturn(doneMock);
 
-    String output = bout.toString();
-    assertThat(output).contains("Job status: DONE");
-    String jobName = Arrays.stream(output.split("\n"))
-        .filter(line -> line.contains("Job name:"))
-        .findFirst()
-        .get();
-    jobName = jobName.split(":")[1].trim();
-    try (DlpServiceClient dlp = DlpServiceClient.create()) {
-      dlp.deleteDlpJob(jobName);
+        InfoTypeStats infoTypeStats =
+                InfoTypeStats.newBuilder()
+                        .setInfoType(InfoType.newBuilder().setName("EMAIL_ADDRESS").build())
+                        .setCount(1)
+                        .build();
+        DlpJob dlpJob =
+                DlpJob.newBuilder()
+                        .setName("projects/project_id/locations/global/dlpJobs/job_id")
+                        .setState(DlpJob.JobState.DONE)
+                        .setInspectDetails(
+                                InspectDataSourceDetails.newBuilder()
+                                        .setResult(
+                                                InspectDataSourceDetails.Result.newBuilder()
+                                                        .addInfoTypeStats(infoTypeStats)
+                                                        .build()))
+                        .build();
+        when(doneMock.get(15, TimeUnit.MINUTES)).thenReturn(true);
+        when(dlpServiceClient.createDlpJob(any(CreateDlpJobRequest.class))).thenReturn(dlpJob);
+        when(dlpServiceClient.getDlpJob((GetDlpJobRequest) any())).thenReturn(dlpJob);
+        InspectBigQueryTable.inspectBigQueryTable("bigquery-public-data", "usa_names",
+                "usa_1910_current", "topic_id", "subscription_id");
+        String output = bout.toString();
+        assertThat(output).contains("Job status: DONE");
+        assertThat(output)
+                .contains("Job name: projects/project_id/locations/global/dlpJobs/job_id");
+        assertThat(output).contains("Info type: EMAIL_ADDRESS");
+        verify(dlpServiceClient, times(1)).createDlpJob(any(CreateDlpJobRequest.class));
+        verify(dlpServiceClient, times(1)).getDlpJob(any(GetDlpJobRequest.class));
+      }
     }
   }
 

@@ -27,6 +27,7 @@
 /workflows                       @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/torus-dpe
 
 # Infrastructure
+/accessapproval                  @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/dee-infra
 /auth                            @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/dee-infra @GoogleCloudPlatform/googleapis-auth
 /batch                           @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/dee-infra
 /compute                         @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/dee-infra
@@ -57,7 +58,7 @@
 /storage                         @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/cloud-storage-dpes
 /storage-transfer                @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/cloud-storage-dpes
 # ---* Infra DB
-/cloud-sql                       @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/infra-db-dpes
+/cloud-sql                       @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/infra-db-sdk
 
 # Data & AI
 /aiplatform                      @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/dee-data-ai
@@ -98,3 +99,4 @@
 /pubsublite                      @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/api-pubsub-and-pubsublite
 /retail                          @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/cloud-retail-team
 /unittests                       @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/serverless-runtimes
+/bigquery/bigquerydatatransfer   @GoogleCloudPlatform/java-samples-reviewers @yoshi-approver @GoogleCloudPlatform/bigquery-data-connectors
