@@ -106,7 +106,7 @@ public class DataGenerator {
         .setInstanceId(options.getBigtableInstanceId());
 
     // adminSettingsBuilder.stubSettings()
-    //     .setEndpoint("test-bigtableadmin.sandbox.googleapis.com:443");
+    //     .setEndpoint("staging-bigtableadmin.sandbox.googleapis.com:443");
 
     BigtableTableAdminClient adminClient = BigtableTableAdminClient.create(
         adminSettingsBuilder.build());
@@ -191,15 +191,16 @@ public class DataGenerator {
               .withProjectId(options.getProject())
               .withInstanceId(options.getBigtableInstanceId())
               .withTableId(options.getBigtableTableId())
+              // .withAppProfileId("profile")
               .withConfiguration(BigtableOptionsFactory.BIGTABLE_ENABLE_BULK_MUTATION_FLOW_CONTROL, "true")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_BULK_MAX_ROW_KEY_COUNT, "12")
               // .withConfiguration("google.bigtable.enable.bulk.mutation.flow.control", "true")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_CPU_BASED_THROTTLING_ENABLED, "true")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_CPU_BASED_THROTTLING_TARGET_PERCENT, "70")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_HOST_KEY,
-              //     "test-bigtable.sandbox.googleapis.com")
+              //     "staging-bigtable.sandbox.googleapis.com")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_ADMIN_HOST_KEY,
-              //     "test-bigtableadmin.sandbox.googleapis.com")
+              //     "staging-bigtableadmin.sandbox.googleapis.com")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_PORT_KEY, "443")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_BULK_MAX_REQUEST_SIZE_BYTES, "1048576")
               // .withConfiguration(BigtableOptionsFactory.BIGTABLE_MUTATE_RPC_ATTEMPT_TIMEOUT_MS_KEY, "610000")
@@ -213,20 +214,23 @@ public class DataGenerator {
           ParDo.of(new CreateMutationFn(options.getBigtableColsPerRow(),
               options.getBigtableBytesPerCol(), rowkeyFormat)));
 
+      BigtableIO.Write write = BigtableIO.write()
+          .withProjectId(options.getProject())
+          .withInstanceId(options.getBigtableInstanceId())
+          .withTableId(options.getBigtableTableId())
+          // .withMaxOutstandingElements(9999999)
+          // .withMaxOutstandingBytes(99999999)
+          // .withMaxOutstandingElements(999999)
+          .withMaxElementsPerBatch(90)
+          .withFlowControl(true)
+          // .withOperationTimeout(Duration.standardMinutes(20))
+          // .withFlowControl(true)
+          .withAttemptTimeout(Duration.standardSeconds(60));
+
       mutations.apply(
           String.format("Write data to table %s via BigtableIO", options.getBigtableTableId()),
-          BigtableIO.write()
-              .withProjectId(options.getProject())
-              .withInstanceId(options.getBigtableInstanceId())
-              .withTableId(options.getBigtableTableId())
-              // .withMaxOutstandingElements(9999999)
-              // .withMaxOutstandingBytes(99999999)
-              // .withMaxOutstandingElements(999999)
-              .withMaxElementsPerBatch(90)
-              .withFlowControl(true)
-              // .withOperationTimeout(Duration.standardMinutes(20))
-              // .withFlowControl(true)
-              .withAttemptTimeout(Duration.standardSeconds(60)));
+          write
+          );
 
     }
 
